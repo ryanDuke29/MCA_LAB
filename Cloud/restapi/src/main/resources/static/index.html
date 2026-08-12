@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Movie API</title>
+</head>
+
+<body>
+
+    <h2>Movie API</h2>
+
+    <button onclick="getMovies()">Get All Movies</button>
+
+    <h3>Add Movie</h3>
+
+    <input id="id" placeholder="Id">
+    <input id="name" placeholder="Name">
+    <input id="genre" placeholder="Genre">
+    <input id="rating" placeholder="Rating">
+
+    <button onclick="addMovie()">Add Movie</button>
+
+    <h3>Update Movie</h3>
+
+    <input id="updateId" placeholder="Movie Id">
+    <input id="updateName" placeholder="Name">
+    <input id="updateGenre" placeholder="Genre">
+    <input id="updateRating" placeholder="Rating">
+
+    <button onclick="updateMovie()">Update</button>
+
+    <h3>Delete Movie</h3>
+
+    <input id="deleteId" placeholder="Movie Id">
+
+    <button onclick="deleteMovie()">Delete</button>
+
+    <pre id="output"></pre>
+
+    <script>
+        function getMovies() {
+            fetch("/movies/allMovies")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("output").textContent =
+                        JSON.stringify(data, null, 2);
+                });
+        }
+
+        function addMovie() {
+
+            const movie = {
+                id: Number(document.getElementById("id").value),
+                name: document.getElementById("name").value,
+                genre: document.getElementById("genre").value,
+                rating: Number(document.getElementById("rating").value)
+            };
+
+            fetch("/movies/addMovie", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(movie)
+            })
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                    document.getElementById("id").value = "";
+                    document.getElementById("name").value = "";
+                    document.getElementById("genre").value = "";
+                    document.getElementById("rating").value = "";
+                    getMovies();
+                });
+        }
+
+        function updateMovie() {
+
+            const id = document.getElementById("updateId").value;
+
+            const movie = {
+                id: Number(id),
+                name: document.getElementById("updateName").value,
+                genre: document.getElementById("updateGenre").value,
+                rating: Number(document.getElementById("updateRating").value)
+            };
+
+            fetch("/movies/" + id, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(movie)
+            })
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                    document.getElementById("id").value = "";
+                    document.getElementById("name").value = "";
+                    document.getElementById("genre").value = "";
+                    document.getElementById("rating").value = "";
+                    getMovies();
+                });
+        }
+
+        function deleteMovie() {
+
+            const id = document.getElementById("deleteId").value;
+
+            fetch("/movies/" + id, {
+                method: "DELETE"
+            })
+                .then(response => response.text())
+                .then(data => {
+                    alert(data);
+                    getMovies();
+                });
+        }
+    </script>
+
+</body>
+
+</html>
